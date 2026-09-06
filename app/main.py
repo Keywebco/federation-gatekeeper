@@ -363,3 +363,91 @@ async def read_file(path: str):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Workflow Automation Routes (added by Federation Hub enhancement)
+# ---------------------------------------------------------------------------
+from app.workflows import (
+    WORKFLOWS, get_workflow_list, get_logs,
+    start_scheduler, stop_scheduler,
+)
+
+
+@app.on_event("startup")
+async def start_workflows():
+    """Launch the workflow scheduler on startup."""
+    log.info("Starting workflow automation scheduler...")
+    start_scheduler()
+
+
+@app.on_event("shutdown")
+async def stop_workflows():
+    """Stop the scheduler on shutdown."""
+    stop_scheduler()
+
+
+@app.get("/api/workflows")
+async def list_workflows():
+    """List all registered workflows with status."""
+    return {
+        "workflows": get_workflow_list(),
+        "total": len(WORKFLOWS),
+    }
+
+
+@app.get("/api/workflows/{workflow_id}/run")
+async def trigger_workflow(workflow_id: str):
+    """Manually trigger a workflow execution."""
+    if workflow_id not in WORKFLOWS:
+        raise HTTPException(status_code=404, detail=f"Unknown workflow: {workflow_id}")
+
+    wf = WORKFLOWS[workflow_id]
+    result = wf["runner"]()
+    return {
+        "workflow": workflow_id,
+        "name": wf["name"],
+        "result": result,
+        "triggered": "manual",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@app.get("/api/workflows/{workflow_id}/logs")
+async def workflow_logs(workflow_id: str, limit: int = 20):
+    """Retrieve execution logs for a specific workflow."""
+    if workflow_id not in WORKFLOWS:
+        raise HTTPException(status_code=404, detail=f"Unknown workflow: {workflow_id}")
+    logs = get_logs(workflow_id, limit=limit)
+    return {
+        "workflow": workflow_id,
+        "entries": logs,
+        "count": len(logs),
+    }
+
+
+@app.get("/api/logs")
+async def all_logs(limit: int = 50):
+    """Retrieve all workflow execution logs."""
+    logs = get_logs(limit=limit)
+    return {
+        "entries": logs,
+        "count": len(logs),
+    }
+
+
+@app.get("/api/federation")
+async def federation_overview():
+    """Full federation overview: vault + workflows + service health."""
+    stats = vault_stats()
+    workflows = get_workflow_list()
+    uptime_seconds = (datetime.now(timezone.utc) - BOOT_TIME).total_seconds()
+    return {
+        "node": "federation-gatekeeper",
+        "role": "Vault Monitor + Automation Hub",
+        "version": "2.0.0",
+        "uptime_seconds": round(uptime_seconds),
+        "vault": stats,
+        "workflows": workflows,
+        "federation": "NextXus",
+    }

@@ -15,6 +15,7 @@
             --text-dim: #888;
             --danger: #ff4444;
             --warn: #ffaa00;
+            --blue: #4488ff;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -24,7 +25,6 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
-        /* Animated background grid */
         body::before {
             content: '';
             position: fixed;
@@ -70,44 +70,16 @@
             0% { left: -100%; }
             100% { left: 100%; }
         }
-        .logo {
-            font-size: 1.2rem;
-            color: var(--accent);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-        }
-        h1 {
-            font-size: 2rem;
-            color: var(--accent);
-            text-shadow: 0 0 20px rgba(0,255,136,0.3);
-            margin-bottom: 0.3rem;
-        }
-        .subtitle {
-            color: var(--text-dim);
-            font-size: 0.9rem;
-        }
+        .logo { font-size: 1.2rem; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 0.5rem; }
+        h1 { font-size: 2rem; color: var(--accent); text-shadow: 0 0 20px rgba(0,255,136,0.3); margin-bottom: 0.3rem; }
+        .subtitle { color: var(--text-dim); font-size: 0.9rem; }
         .status-badge {
-            display: inline-block;
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 1rem;
+            display: inline-block; padding: 0.3rem 1rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: bold; text-transform: uppercase;
+            letter-spacing: 2px; margin-top: 1rem;
         }
-        .status-operational {
-            background: rgba(0,255,136,0.15);
-            color: var(--accent);
-            border: 1px solid var(--accent-dim);
-            animation: pulse 2s ease-in-out infinite;
-        }
-        .status-offline {
-            background: rgba(255,68,68,0.15);
-            color: var(--danger);
-            border: 1px solid var(--danger);
-        }
+        .status-operational { background: rgba(0,255,136,0.15); color: var(--accent); border: 1px solid var(--accent-dim); animation: pulse 2s ease-in-out infinite; }
+        .status-offline { background: rgba(255,68,68,0.15); color: var(--danger); border: 1px solid var(--danger); }
         @keyframes pulse {
             0%, 100% { box-shadow: 0 0 5px rgba(0,255,136,0.2); }
             50% { box-shadow: 0 0 20px rgba(0,255,136,0.4); }
@@ -119,118 +91,85 @@
             margin-bottom: 2rem;
         }
         .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            transition: border-color 0.3s;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.5rem; transition: border-color 0.3s;
         }
         .card:hover { border-color: var(--accent-dim); }
-        .card-label {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
-        }
-        .card-value {
-            font-size: 1.8rem;
-            color: var(--accent);
-            font-weight: bold;
-        }
-        .card-detail {
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            margin-top: 0.3rem;
-        }
+        .card-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; }
+        .card-value { font-size: 1.8rem; color: var(--accent); font-weight: bold; }
+        .card-detail { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.3rem; }
         .section {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;
         }
-        .section h2 {
-            font-size: 1rem;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+        .section h2 { font-size: 1rem; color: var(--accent); margin-bottom: 1rem; letter-spacing: 2px; text-transform: uppercase; }
         .endpoint {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 1rem;
-            background: rgba(0,255,136,0.03);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            margin-bottom: 0.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.8rem 1rem; background: rgba(0,255,136,0.03);
+            border: 1px solid var(--border); border-radius: 6px; margin-bottom: 0.5rem;
             transition: background 0.2s;
         }
-        .endpoint:hover {
-            background: rgba(0,255,136,0.08);
-        }
-        .endpoint-method {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 3px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
+        .endpoint:hover { background: rgba(0,255,136,0.08); }
+        .endpoint-method { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 3px; font-weight: bold; letter-spacing: 1px; }
         .method-get { background: rgba(0,136,255,0.2); color: #4488ff; }
         .method-post { background: rgba(255,136,0,0.2); color: #ffaa44; }
-        .endpoint-path {
-            flex: 1;
-            margin-left: 1rem;
-            color: var(--text);
+        .endpoint-path { flex: 1; margin-left: 1rem; color: var(--text); }
+        .endpoint-desc { color: var(--text-dim); font-size: 0.8rem; }
+        .commit-info { font-size: 0.85rem; line-height: 1.6; }
+        .commit-hash { color: var(--accent); font-family: monospace; }
+
+        /* Workflow cards */
+        .wf-card {
+            background: rgba(0,255,136,0.03); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.2rem; margin-bottom: 0.8rem;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.3s;
         }
-        .endpoint-desc {
-            color: var(--text-dim);
-            font-size: 0.8rem;
+        .wf-card:hover { border-color: var(--accent-dim); background: rgba(0,255,136,0.06); }
+        .wf-info { flex: 1; }
+        .wf-name { font-size: 0.95rem; color: var(--accent); font-weight: bold; margin-bottom: 0.3rem; }
+        .wf-desc { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.4rem; }
+        .wf-meta { font-size: 0.7rem; color: var(--text-dim); }
+        .wf-status {
+            display: inline-block; padding: 0.15rem 0.6rem; border-radius: 10px;
+            font-size: 0.65rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
         }
-        .commit-info {
-            font-size: 0.85rem;
-            line-height: 1.6;
+        .wf-status-healthy, .wf-status-clean, .wf-status-operational { background: rgba(0,255,136,0.15); color: var(--accent); }
+        .wf-status-warning, .wf-status-alert, .wf-status-partial { background: rgba(255,170,0,0.15); color: var(--warn); }
+        .wf-status-error, .wf-status-degraded, .wf-status-critical { background: rgba(255,68,68,0.15); color: var(--danger); }
+        .wf-status-never_run { background: rgba(100,100,100,0.15); color: var(--text-dim); }
+        .wf-actions { margin-left: 1rem; }
+        .run-btn {
+            background: rgba(0,255,136,0.1); color: var(--accent); border: 1px solid var(--accent-dim);
+            padding: 0.4rem 1rem; border-radius: 4px; font-family: 'Courier New', monospace;
+            font-size: 0.75rem; cursor: pointer; transition: all 0.3s; letter-spacing: 1px;
         }
-        .commit-hash {
-            color: var(--accent);
-            font-family: monospace;
+        .run-btn:hover { background: rgba(0,255,136,0.2); box-shadow: 0 0 10px rgba(0,255,136,0.2); }
+        .run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .sync-btn {
+            background: rgba(0,255,136,0.1); color: var(--accent); border: 1px solid var(--accent-dim);
+            padding: 0.6rem 1.5rem; border-radius: 6px; font-family: 'Courier New', monospace;
+            font-size: 0.85rem; cursor: pointer; transition: all 0.3s; letter-spacing: 1px;
         }
+        .sync-btn:hover { background: rgba(0,255,136,0.2); box-shadow: 0 0 15px rgba(0,255,136,0.2); }
+        .sync-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #sync-result { margin-top: 1rem; font-size: 0.85rem; display: none; }
+
+        .log-entry {
+            padding: 0.5rem 0.8rem; font-size: 0.75rem; border-bottom: 1px solid var(--border);
+            display: flex; gap: 1rem; align-items: center;
+        }
+        .log-entry:last-child { border-bottom: none; }
+        .log-time { color: var(--text-dim); min-width: 140px; }
+        .log-wf { color: var(--blue); min-width: 120px; }
+
         footer {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-dim);
-            font-size: 0.75rem;
-            border-top: 1px solid var(--border);
+            text-align: center; padding: 2rem; color: var(--text-dim);
+            font-size: 0.75rem; border-top: 1px solid var(--border);
         }
         footer a { color: var(--accent-dim); text-decoration: none; }
         footer a:hover { text-decoration: underline; }
-        .sync-btn {
-            background: rgba(0,255,136,0.1);
-            color: var(--accent);
-            border: 1px solid var(--accent-dim);
-            padding: 0.6rem 1.5rem;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            letter-spacing: 1px;
-        }
-        .sync-btn:hover {
-            background: rgba(0,255,136,0.2);
-            box-shadow: 0 0 15px rgba(0,255,136,0.2);
-        }
-        .sync-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        #sync-result {
-            margin-top: 1rem;
-            font-size: 0.85rem;
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -238,7 +177,7 @@
         <header>
             <div class="logo">NextXus Federation</div>
             <h1>GATEKEEPER</h1>
-            <p class="subtitle">Obsidian Vault Monitor — Autonomous Swarm Unit #001</p>
+            <p class="subtitle">Vault Monitor + Automation Hub — Swarm Unit #001</p>
             {% if stats.synced %}
             <div class="status-badge status-operational">Operational</div>
             {% else %}
@@ -263,9 +202,9 @@
                 <div class="card-detail">Obsidian vault</div>
             </div>
             <div class="card">
-                <div class="card-label">Node Type</div>
-                <div class="card-value" style="font-size:1.2rem;">GATEKEEPER</div>
-                <div class="card-detail">Swarm Unit #001</div>
+                <div class="card-label">Workflows</div>
+                <div class="card-value" id="wf-count">3</div>
+                <div class="card-detail">Automated tasks</div>
             </div>
         </div>
 
@@ -280,6 +219,21 @@
         </div>
         {% endif %}
 
+        <!-- WORKFLOW AUTOMATION SECTION -->
+        <div class="section">
+            <h2>Workflow Automation</h2>
+            <div id="workflows-container">
+                <div style="color: var(--text-dim); font-size: 0.85rem;">Loading workflows...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Recent Activity</h2>
+            <div id="logs-container">
+                <div style="color: var(--text-dim); font-size: 0.85rem;">Loading logs...</div>
+            </div>
+        </div>
+
         <div class="section">
             <h2>Vault Sync</h2>
             <button class="sync-btn" id="sync-btn" onclick="triggerSync()">SYNC NOW</button>
@@ -291,7 +245,27 @@
             <div class="endpoint">
                 <span class="endpoint-method method-get">GET</span>
                 <span class="endpoint-path">/status</span>
-                <span class="endpoint-desc">Vault health & stats</span>
+                <span class="endpoint-desc">Vault health &amp; stats</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method method-get">GET</span>
+                <span class="endpoint-path">/api/workflows</span>
+                <span class="endpoint-desc">List all workflows</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method method-get">GET</span>
+                <span class="endpoint-path">/api/workflows/{id}/run</span>
+                <span class="endpoint-desc">Trigger a workflow</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method method-get">GET</span>
+                <span class="endpoint-path">/api/workflows/{id}/logs</span>
+                <span class="endpoint-desc">Workflow execution logs</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method method-get">GET</span>
+                <span class="endpoint-path">/api/federation</span>
+                <span class="endpoint-desc">Full federation overview</span>
             </div>
             <div class="endpoint">
                 <span class="endpoint-method method-post">POST</span>
@@ -300,13 +274,13 @@
             </div>
             <div class="endpoint">
                 <span class="endpoint-method method-get">GET</span>
-                <span class="endpoint-path">/query?q=search+terms</span>
+                <span class="endpoint-path">/query?q=term</span>
                 <span class="endpoint-desc">Search vault files</span>
             </div>
             <div class="endpoint">
                 <span class="endpoint-method method-get">GET</span>
-                <span class="endpoint-path">/ask?q=your+question</span>
-                <span class="endpoint-desc">LLM-powered vault Q&A</span>
+                <span class="endpoint-path">/ask?q=question</span>
+                <span class="endpoint-desc">LLM-powered vault Q&amp;A</span>
             </div>
             <div class="endpoint">
                 <span class="endpoint-method method-get">GET</span>
@@ -318,25 +292,91 @@
                 <span class="endpoint-path">/file/{path}</span>
                 <span class="endpoint-desc">Read a specific file</span>
             </div>
-            <div class="endpoint">
-                <span class="endpoint-method method-get">GET</span>
-                <span class="endpoint-path">/health</span>
-                <span class="endpoint-desc">Simple health check</span>
-            </div>
         </div>
 
         <footer>
-            <p>Federation Gatekeeper v1.0.0 — NextXus Federation Swarm Network</p>
+            <p>Federation Gatekeeper v2.0.0 — NextXus Federation Swarm Network</p>
+            <p>Vault Monitor + Automation Hub — Swarm Unit #001</p>
             <p>Vault: <a href="{{ vault_repo }}">{{ vault_repo }}</a></p>
         </footer>
     </div>
 
     <script>
+        async function loadWorkflows() {
+            try {
+                const resp = await fetch('/api/workflows');
+                const data = await resp.json();
+                const container = document.getElementById('workflows-container');
+                if (!data.workflows || data.workflows.length === 0) {
+                    container.innerHTML = '<div style="color:var(--text-dim)">No workflows configured</div>';
+                    return;
+                }
+                container.innerHTML = data.workflows.map(wf => `
+                    <div class="wf-card">
+                        <div class="wf-info">
+                            <div class="wf-name">${wf.name}</div>
+                            <div class="wf-desc">${wf.description}</div>
+                            <div class="wf-meta">
+                                Every ${wf.interval_hours}h
+                                ${wf.last_run ? ' | Last: ' + wf.last_run.slice(0,19) + 'Z' : ' | Never run'}
+                                | <span class="wf-status wf-status-${wf.last_status}">${wf.last_status}</span>
+                            </div>
+                        </div>
+                        <div class="wf-actions">
+                            <button class="run-btn" onclick="triggerWorkflow('${wf.id}')" id="btn-${wf.id}">RUN</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                document.getElementById('workflows-container').innerHTML =
+                    '<div style="color:var(--danger)">Failed to load workflows</div>';
+            }
+        }
+
+        async function loadLogs() {
+            try {
+                const resp = await fetch('/api/logs?limit=10');
+                const data = await resp.json();
+                const container = document.getElementById('logs-container');
+                if (!data.entries || data.entries.length === 0) {
+                    container.innerHTML = '<div style="color:var(--text-dim)">No activity yet</div>';
+                    return;
+                }
+                container.innerHTML = data.entries.reverse().map(log => `
+                    <div class="log-entry">
+                        <span class="log-time">${log.timestamp.slice(0,19)}Z</span>
+                        <span class="log-wf">${log.workflow}</span>
+                        <span class="wf-status wf-status-${log.status}">${log.status}</span>
+                        <span style="color:var(--text-dim);margin-left:auto;">${log.duration_ms}ms</span>
+                    </div>
+                `).join('');
+            } catch (e) {
+                document.getElementById('logs-container').innerHTML =
+                    '<div style="color:var(--danger)">Failed to load logs</div>';
+            }
+        }
+
+        async function triggerWorkflow(id) {
+            const btn = document.getElementById('btn-' + id);
+            btn.disabled = true;
+            btn.textContent = '...';
+            try {
+                const resp = await fetch('/api/workflows/' + id + '/run');
+                const data = await resp.json();
+                btn.textContent = data.result.ok ? 'DONE' : 'FAIL';
+                setTimeout(() => { btn.textContent = 'RUN'; btn.disabled = false; }, 2000);
+                loadWorkflows();
+                loadLogs();
+            } catch (e) {
+                btn.textContent = 'ERR';
+                setTimeout(() => { btn.textContent = 'RUN'; btn.disabled = false; }, 2000);
+            }
+        }
+
         async function triggerSync() {
             const btn = document.getElementById('sync-btn');
             const result = document.getElementById('sync-result');
-            btn.disabled = true;
-            btn.textContent = 'SYNCING...';
+            btn.disabled = true; btn.textContent = 'SYNCING...';
             result.style.display = 'block';
             result.textContent = 'Pulling from GitHub...';
             result.style.color = 'var(--text-dim)';
@@ -355,9 +395,14 @@
                 result.style.color = 'var(--danger)';
                 result.textContent = 'Error: ' + e.message;
             }
-            btn.disabled = false;
-            btn.textContent = 'SYNC NOW';
+            btn.disabled = false; btn.textContent = 'SYNC NOW';
         }
+
+        // Load on page ready
+        loadWorkflows();
+        loadLogs();
+        // Auto-refresh every 60 seconds
+        setInterval(() => { loadWorkflows(); loadLogs(); }, 60000);
     </script>
 </body>
 </html>
