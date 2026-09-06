@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federation Gatekeeper — NextXus</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --border: #1e1e2e;
+            --accent: #00ff88;
+            --accent-dim: #00cc6a;
+            --text: #e0e0e0;
+            --text-dim: #888;
+            --danger: #ff4444;
+            --warn: #ffaa00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background:
+                linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridPulse 4s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 200%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            animation: scanline 3s linear infinite;
+        }
+        @keyframes scanline {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        .logo {
+            font-size: 1.2rem;
+            color: var(--accent);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        h1 {
+            font-size: 2rem;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(0,255,136,0.3);
+            margin-bottom: 0.3rem;
+        }
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 1rem;
+        }
+        .status-operational {
+            background: rgba(0,255,136,0.15);
+            color: var(--accent);
+            border: 1px solid var(--accent-dim);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .status-offline {
+            background: rgba(255,68,68,0.15);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(0,255,136,0.2); }
+            50% { box-shadow: 0 0 20px rgba(0,255,136,0.4); }
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: border-color 0.3s;
+        }
+        .card:hover { border-color: var(--accent-dim); }
+        .card-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+        .card-value {
+            font-size: 1.8rem;
+            color: var(--accent);
+            font-weight: bold;
+        }
+        .card-detail {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 0.3rem;
+        }
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .section h2 {
+            font-size: 1rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .endpoint {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: rgba(0,255,136,0.03);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s;
+        }
+        .endpoint:hover {
+            background: rgba(0,255,136,0.08);
+        }
+        .endpoint-method {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .method-get { background: rgba(0,136,255,0.2); color: #4488ff; }
+        .method-post { background: rgba(255,136,0,0.2); color: #ffaa44; }
+        .endpoint-path {
+            flex: 1;
+            margin-left: 1rem;
+            color: var(--text);
+        }
+        .endpoint-desc {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+        .commit-info {
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+        .commit-hash {
+            color: var(--accent);
+            font-family: monospace;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+        footer a { color: var(--accent-dim); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        .sync-btn {
+            background: rgba(0,255,136,0.1);
+            color: var(--accent);
+            border: 1px solid var(--accent-dim);
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+        .sync-btn:hover {
+            background: rgba(0,255,136,0.2);
+            box-shadow: 0 0 15px rgba(0,255,136,0.2);
+        }
+        .sync-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #sync-result {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">NextXus Federation</div>
+            <h1>GATEKEEPER</h1>
+            <p class="subtitle">Obsidian Vault Monitor — Autonomous Swarm Unit #001</p>
+            {% if stats.synced %}
+            <div class="status-badge status-operational">Operational</div>
+            {% else %}
+            <div class="status-badge status-offline">Vault Not Synced</div>
+            {% endif %}
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-label">Uptime</div>
+                <div class="card-value">{{ uptime }}</div>
+                <div class="card-detail">Since {{ boot_time[:19] }}Z</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Vault Files</div>
+                <div class="card-value">{{ stats.files }}</div>
+                <div class="card-detail">{{ stats.markdown_files }} markdown</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Vault Size</div>
+                <div class="card-value">{{ stats.total_size_kb }}KB</div>
+                <div class="card-detail">Obsidian vault</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Node Type</div>
+                <div class="card-value" style="font-size:1.2rem;">GATEKEEPER</div>
+                <div class="card-detail">Swarm Unit #001</div>
+            </div>
+        </div>
+
+        {% if stats.last_commit %}
+        <div class="section">
+            <h2>Last Commit</h2>
+            <div class="commit-info">
+                <span class="commit-hash">{{ stats.last_commit.hash }}</span> —
+                {{ stats.last_commit.message }}<br>
+                <span style="color: var(--text-dim);">{{ stats.last_commit.date }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="section">
+            <h2>Vault Sync</h2>
+            <button class="sync-btn" id="sync-btn" onclick="triggerSync()">SYNC NOW</button>
+            <div id="sync-result"></div>
+        </div>
+
+        <div class="section">
+            <h2>API Endpoints</h2>
+            <div class="endpoint">
+                <span class="endpoint-method method-get">GET</span>
+                <span class="endpoint-path">/status</span>
+                <span class="endpoint-desc">Vault health & stats</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method method-post">POST</span>
+                <span class="endpoint-path">/sync</span>
+                <span class="endpoint-desc">Trigger vault pull</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method method-get">GET</span>
+                <span class="endpoint-path">/query?q=search+terms</span>
+                <span class="endpoint-desc">Search vault files</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method method-get">GET</span>
+                <span class="endpoint-path">/ask?q=your+question</span>
+                <span class="endpoint-desc">LLM-powered vault Q&A</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method method-get">GET</span>
+                <span class="endpoint-path">/files</span>
+                <span class="endpoint-desc">List all vault files</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method method-get">GET</span>
+                <span class="endpoint-path">/file/{path}</span>
+                <span class="endpoint-desc">Read a specific file</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method method-get">GET</span>
+                <span class="endpoint-path">/health</span>
+                <span class="endpoint-desc">Simple health check</span>
+            </div>
+        </div>
+
+        <footer>
+            <p>Federation Gatekeeper v1.0.0 — NextXus Federation Swarm Network</p>
+            <p>Vault: <a href="{{ vault_repo }}">{{ vault_repo }}</a></p>
+        </footer>
+    </div>
+
+    <script>
+        async function triggerSync() {
+            const btn = document.getElementById('sync-btn');
+            const result = document.getElementById('sync-result');
+            btn.disabled = true;
+            btn.textContent = 'SYNCING...';
+            result.style.display = 'block';
+            result.textContent = 'Pulling from GitHub...';
+            result.style.color = 'var(--text-dim)';
+            try {
+                const resp = await fetch('/sync', { method: 'POST' });
+                const data = await resp.json();
+                if (data.sync.ok) {
+                    result.style.color = 'var(--accent)';
+                    result.textContent = 'Sync complete: ' + data.sync.detail +
+                        ' | Files: ' + data.vault.files + ' | MD: ' + data.vault.markdown_files;
+                } else {
+                    result.style.color = 'var(--danger)';
+                    result.textContent = 'Sync failed: ' + data.sync.detail;
+                }
+            } catch (e) {
+                result.style.color = 'var(--danger)';
+                result.textContent = 'Error: ' + e.message;
+            }
+            btn.disabled = false;
+            btn.textContent = 'SYNC NOW';
+        }
+    </script>
+</body>
+</html>

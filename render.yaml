@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: federation-gatekeeper
+    runtime: docker
+    plan: free
+    repo: https://github.com/Keywebco/federation-gatekeeper
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: API_KEY
+        sync: false
+      - key: API_BASE
+        value: https://integrations.emergentagent.com/llm
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: VAULT_REPO
+        value: https://github.com/Keywebco/federation-private-vault
