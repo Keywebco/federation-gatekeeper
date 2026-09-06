@@ -161,7 +161,7 @@ def run_sync_alert() -> dict:
 
         commits = []
         alerts = []
-        known_authors = {"Keywebco", "keywebco", "github-actions", "GitHub"}
+        known_authors = {"Keywebco", "keywebco", "github-actions", "GitHub", "Federation Vault Bot", "federation-vault-bot"}
 
         for line in result.stdout.strip().split("\n"):
             if not line.strip():
