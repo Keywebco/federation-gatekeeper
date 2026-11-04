@@ -34,6 +34,9 @@ API_BASE = os.getenv("API_BASE", "https://integrations.emergentagent.com/llm")
 VAULT_DIR = Path("/tmp/vault")
 SYNC_LOCK = False
 BOOT_TIME = datetime.now(timezone.utc)
+# Last vault sync result, recorded by record_last_sync(). Detail is sanitized
+# (token replaced, truncated) before it is stored or surfaced in /status.
+LAST_SYNC = None
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger("gatekeeper")
@@ -59,6 +62,27 @@ def _auth_url(repo_url: str) -> str:
     if GITHUB_TOKEN and "github.com" in repo_url:
         return repo_url.replace("https://github.com", f"https://x-access-token:{GITHUB_TOKEN}@github.com")
     return repo_url
+
+
+def _sanitize_detail(text: str) -> str:
+    """Strip any GitHub token from a detail string and truncate it."""
+    if not text:
+        return ""
+    cleaned = text.replace(GITHUB_TOKEN, "***") if GITHUB_TOKEN else text
+    return cleaned[:500]
+
+
+def record_last_sync(result: dict) -> dict:
+    """Record a sanitized copy of the last vault sync result in module state."""
+    global LAST_SYNC
+    recorded = {
+        "ok": bool(result.get("ok")),
+        "action": result.get("action"),
+        "detail": _sanitize_detail(str(result.get("detail", ""))),
+        "timestamp": result.get("timestamp") or datetime.now(timezone.utc).isoformat(),
+    }
+    LAST_SYNC = recorded
+    return recorded
 
 
 def clone_or_pull() -> dict:
@@ -96,7 +120,7 @@ def clone_or_pull() -> dict:
     except subprocess.TimeoutExpired:
         return {"ok": False, "detail": "Git operation timed out"}
     except Exception as e:
-        return {"ok": False, "detail": str(e)}
+        return {"ok": False, "detail": _sanitize_detail(str(e))}
     finally:
         SYNC_LOCK = False
 
@@ -104,7 +128,7 @@ def clone_or_pull() -> dict:
 def vault_stats() -> dict:
     """Gather vault file statistics."""
     if not VAULT_DIR.exists():
-        return {"synced": False, "files": 0, "markdown_files": 0, "total_size_kb": 0}
+        return {"synced": False, "has_git": False, "files": 0, "markdown_files": 0, "total_size_kb": 0, "last_commit": None}
     md_files = list(VAULT_DIR.rglob("*.md"))
     all_files = [f for f in VAULT_DIR.rglob("*") if f.is_file() and ".git" not in str(f)]
     total_kb = sum(f.stat().st_size for f in all_files) / 1024
@@ -122,8 +146,13 @@ def vault_stats() -> dict:
     except Exception:
         last_commit = None
 
+    has_git = (VAULT_DIR / ".git").exists()
+    # Synced means a real clone with a real commit, not merely an existing
+    # (possibly empty) directory. A 0-file, no-commit vault is NOT synced.
+    synced = bool(has_git and last_commit is not None)
     return {
-        "synced": True,
+        "synced": synced,
+        "has_git": has_git,
         "files": len(all_files),
         "markdown_files": len(md_files),
         "total_size_kb": round(total_kb, 1),
@@ -246,7 +275,8 @@ async def startup_sync():
     """Auto-sync vault on startup."""
     log.info("Gatekeeper starting — syncing vault...")
     result = clone_or_pull()
-    log.info(f"Vault sync: {result}")
+    recorded = record_last_sync(result)
+    log.info(f"Vault sync: {recorded}")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -277,6 +307,7 @@ async def status():
         "uptime_seconds": round(uptime_seconds),
         "boot_time": BOOT_TIME.isoformat(),
         "vault": stats,
+        "last_sync": LAST_SYNC,
         "federation": "NextXus",
         "node_type": "gatekeeper",
     }
@@ -292,9 +323,11 @@ async def health():
 async def sync():
     """Trigger vault sync from GitHub."""
     result = clone_or_pull()
+    recorded = record_last_sync(result)
     stats = vault_stats()
     return {
         "sync": result,
+        "last_sync": recorded,
         "vault": stats,
     }
 
