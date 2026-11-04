@@ -74,8 +74,8 @@ def run_heartbeat() -> dict:
     start = time.monotonic()
     try:
         if not VAULT_DIR.exists() or not (VAULT_DIR / ".git").exists():
-            _log_execution("heartbeat", "warning", "Vault not cloned yet")
-            return {"ok": False, "detail": "Vault directory not found"}
+            _log_execution("heartbeat", "warning", "vault_not_cloned: Vault not cloned yet")
+            return {"ok": False, "error_code": "vault_not_cloned", "detail": "Vault not cloned yet"}
 
         # Check git status
         result = subprocess.run(
@@ -96,8 +96,10 @@ def run_heartbeat() -> dict:
         )
         if commit_result.returncode == 0 and commit_result.stdout.strip():
             commit_age_hours = (time.time() - int(commit_result.stdout.strip())) / 3600
+            git_log_failed = False
         else:
             commit_age_hours = -1
+            git_log_failed = True
 
         elapsed = int((time.monotonic() - start) * 1000)
         status_str = "healthy"
@@ -107,6 +109,8 @@ def run_heartbeat() -> dict:
             alerts.append(f"{dirty_files} dirty files detected")
         if commit_age_hours > 168:  # 7 days
             alerts.append(f"Last commit {commit_age_hours:.0f}h ago (>7 days)")
+        if git_log_failed:
+            alerts.append("git log failed: no last commit found")
         if len(md_files) == 0:
             alerts.append("No markdown files found")
             status_str = "degraded"
@@ -116,6 +120,7 @@ def run_heartbeat() -> dict:
 
         detail = {
             "vault_status": status_str,
+            "error_code": "git_log_failed" if git_log_failed else None,
             "markdown_files": len(md_files),
             "total_files": len(all_files),
             "total_size_kb": round(total_kb, 1),
@@ -128,8 +133,8 @@ def run_heartbeat() -> dict:
 
     except Exception as e:
         elapsed = int((time.monotonic() - start) * 1000)
-        _log_execution("heartbeat", "error", str(e), elapsed)
-        return {"ok": False, "detail": str(e)}
+        _log_execution("heartbeat", "error", f"unexpected_error: {e}", elapsed)
+        return {"ok": False, "error_code": "unexpected_error", "detail": str(e)}
 
 
 # ---------------------------------------------------------------------------
@@ -139,9 +144,12 @@ def run_sync_alert() -> dict:
     """Check recent vault commits for anomalies (mass deletions, unknown authors)."""
     start = time.monotonic()
     try:
+        if not VAULT_DIR.exists() or not (VAULT_DIR / ".git").exists():
+            _log_execution("sync-alert", "error", "vault_not_cloned: Vault not cloned yet")
+            return {"ok": False, "error_code": "vault_not_cloned", "detail": "Vault not cloned yet"}
         if not GITHUB_TOKEN:
-            _log_execution("sync-alert", "skipped", "No GITHUB_TOKEN configured")
-            return {"ok": False, "detail": "GITHUB_TOKEN not set"}
+            _log_execution("sync-alert", "skipped", "token_not_configured: No GITHUB_TOKEN configured")
+            return {"ok": False, "error_code": "token_not_configured", "detail": "GITHUB_TOKEN not set"}
 
         # Pull latest
         if VAULT_DIR.exists() and (VAULT_DIR / ".git").exists():
@@ -156,8 +164,8 @@ def run_sync_alert() -> dict:
             capture_output=True, text=True, timeout=15,
         )
         if result.returncode != 0:
-            _log_execution("sync-alert", "error", f"git log failed: {result.stderr[:200]}")
-            return {"ok": False, "detail": "git log failed"}
+            _log_execution("sync-alert", "error", f"git_log_failed: {result.stderr[:200]}")
+            return {"ok": False, "error_code": "git_log_failed", "detail": "git log failed"}
 
         commits = []
         alerts = []
@@ -213,8 +221,8 @@ def run_sync_alert() -> dict:
 
     except Exception as e:
         elapsed = int((time.monotonic() - start) * 1000)
-        _log_execution("sync-alert", "error", str(e), elapsed)
-        return {"ok": False, "detail": str(e)}
+        _log_execution("sync-alert", "error", f"unexpected_error: {e}", elapsed)
+        return {"ok": False, "error_code": "unexpected_error", "detail": str(e)}
 
 
 # ---------------------------------------------------------------------------
