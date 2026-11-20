@@ -1,3 +1,5 @@
+> Note added 2026-11-20. Per Roger 2026-11-20: Federation stack is GitHub + Google Drive + repositories + Immutable HumanCodex. Emergent is not used. Mentions of Emergent as a Federation platform or backend in the original text are legacy wording and were not erased. Sites that still appear to be served from Emergent infrastructure need a move to GitHub Pages.
+
 # Federation Gatekeeper v2.0
 
 **Vault Monitor + Automation Hub — NextXus Federation Swarm Unit #001**
@@ -55,7 +57,7 @@ The Gatekeeper is the first autonomous agent unit in the NextXus Federation swar
 | `PORT` | Yes | Server port (Render sets this) |
 | `GITHUB_TOKEN` | Yes | GitHub PAT for vault access |
 | `VAULT_REPO` | No | Vault clone URL (default: federation-private-vault) |
-| `API_KEY` | No | Emergent LLM key for /ask endpoint |
+| `API_KEY` | No | Leftover LLM key name for /ask endpoint (formerly an Emergent key; Emergent is not part of the Federation stack as of 2026-11-20) |
 | `API_BASE` | No | LLM API base URL |
 | `RENDER_API_KEY` | No | Render API key for federation status checks |
 
